@@ -1,33 +1,37 @@
-# Unity generated files
-Library/
-Temp/
-Obj/
-Build/
-Builds/
-Logs/
-UserSettings/
+# dependencies
+node_modules/
+.pnp
+.pnp.js
 
-# Unity Package Manager
-[Ll]ibrary/
-[Tt]emp/
-[Oo]bj/
-[Bb]uild/
-[Bb]uilds/
-[Ll]ogs/
-[Uu]ser[Ss]ettings/
+# next.js
+.next/
+out/
 
-# Visual Studio cache/options
-.vs/
-.vscode/
+# production
+build/
 
-# OS generated files
+# env files
+.env
+.env.local
+.env.*.local
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
-# Large files
-*.dylib
+# IDE
+.vs/
+.vscode/
+.idea/
