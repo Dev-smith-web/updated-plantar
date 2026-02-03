@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./style.css" />
+  <title>Login - PlantAR</title>
+</head>
+<body>
+  <div class="container">
+    <h1>PlantAR Login</h1>
+    <input id="username" placeholder="Username" />
+    <input id="password" type="password" placeholder="Password" />
+    <button onclick="login()">Log In</button>
+  </div>
+  <script>
+    function login() {
+      const u = document.getElementById("username").value;
+      const p = document.getElementById("password").value;
+      if (u === "student" && p === "plantar") {
+        window.location.href = "index.html";
+      } else {
+        alert("Try: student / plantar");
+      }
+    }
+  </script>
+</body>
+</html>

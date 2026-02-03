@@ -1,0 +1,32 @@
+##Quiz result
+{
+  "name": "QuizResult",
+  "type": "object",
+  "properties": {
+    "student_name": {
+      "type": "string",
+      "description": "Name of the student"
+    },
+    "score": {
+      "type": "number",
+      "description": "Quiz score"
+    },
+    "total_questions": {
+      "type": "number",
+      "description": "Total number of questions"
+    },
+    "plant_id": {
+      "type": "string",
+      "description": "Plant the quiz was about"
+    },
+    "time_taken": {
+      "type": "number",
+      "description": "Time taken in seconds"
+    }
+  },
+  "required": [
+    "student_name",
+    "score",
+    "total_questions"
+  ]
+}

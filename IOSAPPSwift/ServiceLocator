@@ -1,0 +1,58 @@
+import Foundation
+
+// MARK: - Service Locator (Dependency Injection)
+class ServiceLocator {
+    static let shared = ServiceLocator()
+    
+    private var services: [String: Any] = [:]
+    
+    private init() {}
+    
+    /// Register a service
+    func register<T>(service: T, forKey key: String) {
+        services[key] = service
+    }
+    
+    /// Register a service with type as key
+    func register<T>(_ service: T) {
+        let key = String(describing: T.self)
+        services[key] = service
+    }
+    
+    /// Retrieve a service
+    func resolve<T>(ofType: T.Type) -> T? {
+        let key = String(describing: T.self)
+        return services[key] as? T
+    }
+    
+    /// Retrieve a service with custom key
+    func resolve<T>(forKey key: String) -> T? {
+        return services[key] as? T
+    }
+    
+    /// Check if service is registered
+    func hasService<T>(ofType: T.Type) -> Bool {
+        let key = String(describing: T.self)
+        return services[key] != nil
+    }
+    
+    /// Clear all services
+    func clearAll() {
+        services.removeAll()
+    }
+}
+
+// MARK: - Protocol for Services
+protocol ServiceProvider {
+    associatedtype Service
+    func create() -> Service
+}
+
+// MARK: - Service Registration Extensions
+extension ServiceLocator {
+    func registerSingleton<T>(_ factory: () -> T) {
+        let key = String(describing: T.self)
+        let service = factory()
+        services[key] = service
+    }
+}

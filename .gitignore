@@ -1,0 +1,26 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+*.tmp
+
+# Node / JS
+**/node_modules/
+**/.pnpm-debug.log*
+**/npm-debug.log*
+**/yarn-error.log*
+
+# Next.js
+**/.next/
+**/out/
+**/dist/
+
+# Tooling
+**/.turbo/
+**/.vercel/
+
+# Editors
+.vscode/
+.idea/

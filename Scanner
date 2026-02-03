@@ -1,0 +1,68 @@
+using UnityEngine;
+using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.ARSubsystems;
+
+public class SunflowerScanner : MonoBehaviour
+{
+    [SerializeField] private ARTrackedImageManager trackedImageManager;
+    [SerializeField] private GameObject sunflowerModelPrefab;
+
+    private GameObject spawnedSunflowerModel;
+
+    void OnEnable()
+    {
+        trackedImageManager.trackedImagesChanged += OnTrackedImagesChanged;
+    }
+
+    void OnDisable()
+    {
+        trackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
+    }
+
+    void Start()
+    {
+        // Instantiate sunflower model but keep it hidden until the image is detected
+        spawnedSunflowerModel = Instantiate(sunflowerModelPrefab, Vector3.zero, Quaternion.identity);
+        spawnedSunflowerModel.SetActive(false);
+    }
+
+    private void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs eventArgs)
+    {
+        // When a new image is detected
+        foreach (var trackedImage in eventArgs.added)
+        {
+            UpdateSunflowerModel(trackedImage);
+        }
+
+        // When an existing image is updated (still visible or moved)
+        foreach (var trackedImage in eventArgs.updated)
+        {
+            UpdateSunflowerModel(trackedImage);
+        }
+
+        // When the image is no longer visible
+        foreach (var trackedImage in eventArgs.removed)
+        {
+            spawnedSunflowerModel.SetActive(false);
+        }
+    }
+
+    private void UpdateSunflowerModel(ARTrackedImage trackedImage)
+    {
+        // Check if this image corresponds to "Sunflower"
+        if (trackedImage.referenceImage.name == "Sunflower")
+        {
+            spawnedSunflowerModel.SetActive(trackedImage.trackingState == TrackingState.Tracking);
+
+            if (spawnedSunflowerModel.activeSelf)
+            {
+                spawnedSunflowerModel.transform.position = trackedImage.transform.position;
+                spawnedSunflowerModel.transform.rotation = trackedImage.transform.rotation;
+            }
+        }
+        else
+        {
+            spawnedSunflowerModel.SetActive(false);
+        }
+    }
+}

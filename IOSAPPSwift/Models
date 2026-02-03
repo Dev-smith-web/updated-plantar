@@ -1,0 +1,152 @@
+import Foundation
+
+// MARK: - Plant Model
+struct Plant: Codable, Identifiable {
+    let id: String
+    let plantId: String
+    let displayName: String
+    let description: String
+    let referenceImageUrl: String
+    let modelUrl: String
+    let nativeSize: Double
+    let difficultyLevel: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case plantId = "plant_id"
+        case displayName = "display_name"
+        case description
+        case referenceImageUrl = "reference_image_url"
+        case modelUrl = "model_url"
+        case nativeSize = "native_size"
+        case difficultyLevel = "difficulty_level"
+    }
+    
+    // Computed properties for UI
+    var difficultyStars: Int {
+        return max(1, min(5, difficultyLevel))
+    }
+}
+
+// MARK: - Plant Part Model
+struct PlantPart: Codable, Identifiable {
+    let id: String
+    let partId: String
+    let plantId: String
+    let partName: String
+    let definition: String
+    let functionDescription: String
+    let iconUrl: String?
+    let narrationAudioUrl: String?
+    let meshPath: String?
+    let anchorPointPath: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case partId = "part_id"
+        case plantId = "plant_id"
+        case partName = "part_name"
+        case definition
+        case functionDescription = "function_description"
+        case iconUrl = "icon_url"
+        case narrationAudioUrl = "narration_audio_url"
+        case meshPath = "mesh_path"
+        case anchorPointPath = "anchor_point_path"
+    }
+}
+
+// MARK: - Quiz Question Model
+struct QuizQuestion: Codable, Identifiable {
+    let id: String
+    let questionId: String
+    let plantId: String
+    let type: String // "IdentifyPart", "IdentifyFunction", "TrueFalse"
+    let promptText: String
+    let correctAnswerId: String
+    let choices: [String]
+    let hint: String?
+    let difficulty: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case questionId = "question_id"
+        case plantId = "plant_id"
+        case type
+        case promptText = "prompt_text"
+        case correctAnswerId = "correct_answer_id"
+        case choices
+        case hint
+        case difficulty
+    }
+}
+
+// MARK: - Quiz Attempt Model
+struct QuizAttempt: Codable, Identifiable {
+    let id: String
+    let attemptId: String
+    let plantId: String
+    let questionAnswers: [QuestionAnswer]
+    let totalScore: Int
+    let totalQuestions: Int
+    let percentageScore: Double
+    let completedAt: Date
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case attemptId = "attempt_id"
+        case plantId = "plant_id"
+        case questionAnswers = "question_answers"
+        case totalScore = "total_score"
+        case totalQuestions = "total_questions"
+        case percentageScore = "percentage_score"
+        case completedAt = "completed_at"
+    }
+}
+
+// MARK: - Question Answer Model
+struct QuestionAnswer: Codable {
+    let questionId: String
+    let userAnswer: String
+    let isCorrect: Bool
+    
+    enum CodingKeys: String, CodingKey {
+        case questionId = "question_id"
+        case userAnswer = "user_answer"
+        case isCorrect = "is_correct"
+    }
+}
+
+// MARK: - AR Status Enum
+enum ARStatus {
+    case searching
+    case loading
+    case active(Plant)
+    case error(String)
+}
+
+// MARK: - Toast Model
+struct Toast: Identifiable {
+    let id = UUID()
+    let message: String
+    let type: ToastType
+    let duration: TimeInterval
+    
+    enum ToastType {
+        case success
+        case error
+        case info
+        case warning
+    }
+}
+
+// MARK: - Error Model
+struct AppError: Error, Identifiable {
+    let id = UUID()
+    let message: String
+    let action: (() -> Void)?
+    
+    init(_ message: String, action: (() -> Void)? = nil) {
+        self.message = message
+        self.action = action
+    }
+}

@@ -1,0 +1,26 @@
+using UnityEngine;
+using TMPro;
+
+public class PlantPartInfo : MonoBehaviour
+{
+    [SerializeField] private TextMeshProUGUI infoText;
+
+    public void ShowInfo(string partName)
+    {
+        switch (partName)
+        {
+            case "Flower":
+                infoText.text = "The flower attracts bees and makes seeds.";
+                break;
+            case "Leaf":
+                infoText.text = "Leaves make food using sunlight and air.";
+                break;
+            case "Stem":
+                infoText.text = "The stem supports the plant and moves nutrients.";
+                break;
+            case "Root":
+                infoText.text = "Roots take water and minerals from the soil.";
+                break;
+        }
+    }
+}

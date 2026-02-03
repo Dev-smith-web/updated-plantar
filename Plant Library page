@@ -1,0 +1,158 @@
+Plant library page
+
+import React, { useState } from "react";
+import { base44 } from "@/api/base44Client";
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowRight, Sparkles, Search, ArrowLeft } from "lucide-react"; // Added ArrowLeft
+import { Input } from "@/components/ui/input";
+import { motion } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom"; // Added useNavigate
+import { createPageUrl } from "@/utils";
+
+export default function PlantLibrary() {
+  const navigate = useNavigate(); // Initialized useNavigate
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const { data: plants, isLoading } = useQuery({
+    queryKey: ['plants'],
+    queryFn: () => base44.entities.Plant.list(),
+    initialData: [],
+  });
+
+  const getPlantImage = (plantName) => {
+    const imageMap = {
+      'Sunflower': 'https://images.unsplash.com/photo-1597848212624-e530bb09e59f?w=400',
+      'Rose': 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400',
+      'Cactus': 'https://images.unsplash.com/photo-1509937528035-ad76254b0356?w=400',
+      'Oak Tree': 'https://images.unsplash.com/photo-1542202229-7d93c33f5d07?w=400',
+    };
+    return imageMap[plantName] || 'https://images.unsplash.com/photo-1466781783364-36c955e42a7f?w=400';
+  };
+
+  const filteredPlants = plants.filter(plant =>
+    plant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    plant.scientific_name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div className="min-h-screen bg-[#0a1628] text-white pb-32"> {/* Changed background color and padding */}
+      <div className="max-w-7xl mx-auto p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          {/* Added Back to Home button */}
+          <Button
+            variant="ghost"
+            onClick={() => navigate(createPageUrl("Home"))}
+            className="mb-4 text-cyan-400 hover:text-cyan-300"
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Back to Home
+          </Button>
+          <div className="flex justify-center mb-6">
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/690ebb53f135a788e129c2d4/e70368864_image.png"
+              alt="PlantAR"
+              className="w-20 h-20 object-contain"
+            />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-center mb-4">
+            Plant Library
+          </h1>
+          <p className="text-lg text-slate-400 text-center">
+            Choose a plant to explore its parts and learn amazing facts! 🌿
+          </p>
+
+          {/* Search Bar */}
+          <div className="max-w-md mx-auto mt-6 relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <Input
+              placeholder="Search plants..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-12 py-6 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 rounded-xl"
+            />
+          </div>
+        </motion.div>
+
+        {isLoading ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <Card key={i} className="bg-slate-800/50 border-slate-700">
+                <CardHeader>
+                  <Skeleton className="h-48 w-full rounded-lg bg-slate-700" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-6 w-3/4 mb-2 bg-slate-700" />
+                  <Skeleton className="h-4 w-full bg-slate-700" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : filteredPlants.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-20"
+          >
+            <Sparkles className="w-20 h-20 mx-auto text-slate-600 mb-4" />
+            <p className="text-xl text-slate-400 mb-6">
+              {searchQuery ? "No plants found matching your search" : "No plants available yet!"}
+            </p>
+            {!searchQuery && (
+              <p className="text-slate-500">Teachers can add plants from the Teacher Dashboard</p>
+            )}
+          </motion.div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredPlants.map((plant, index) => (
+              <motion.div
+                key={plant.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Link to={`${createPageUrl("PlantExplorer")}?id=${plant.id}`}>
+                  <Card className="hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer h-full bg-slate-800/50 backdrop-blur border-slate-700 hover:border-cyan-500/50">
+                    <CardHeader className="p-0">
+                      <div className="h-48 overflow-hidden rounded-t-lg relative">
+                        <img
+                          src={plant.image_url || getPlantImage(plant.name)}
+                          alt={plant.name}
+                          className="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <CardTitle className="text-2xl mb-2 text-white">
+                        {plant.name}
+                      </CardTitle>
+                      {plant.scientific_name && (
+                        <p className="text-sm italic text-cyan-400 mb-3">
+                          {plant.scientific_name}
+                        </p>
+                      )}
+                      <p className="text-slate-400 mb-4 line-clamp-2">
+                        {plant.description}
+                      </p>
+                      <Button className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white">
+                        Explore Plant
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

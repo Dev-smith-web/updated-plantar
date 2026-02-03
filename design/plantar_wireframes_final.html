@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlantAR - Final Wireframes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Fredoka', 'Comic Sans MS', cursive;
+            background: linear-gradient(135deg, #a8e6cf 0%, #dcedc8 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2e7d32;
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #558b2f;
+            font-size: 1.3em;
+            margin-bottom: 30px;
+        }
+
+        .screens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .phone-frame {
+            background: #1a1a1a;
+            border-radius: 40px;
+            padding: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            aspect-ratio: 9/19.5;
+        }
+
+        .phone-screen {
+            background: white;
+            border-radius: 30px;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+            background: white;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* PlantAR Logo Banner */
+        .app-logo-banner {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: white;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .logo-icon {
+            font-size: 1.5em;
+        }
+
+        .logo-text {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #2e7d32;
+            letter-spacing: -0.5px;
+        }
+
+        /* Hero Image */
+        .plant-of-day-hero {
+            width: 100%;
+            height: 45vh;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .plant-of-day-hero:hover {
+            transform: scale(1.02);
+        }
+
+        .plant-of-day-hero:active {
+            transform: scale(0.98);
+        }
+
+        .hero-sunflower {
+            background: linear-gradient(135deg, #fff9c4 0%, #ffee58 100%);
+        }
+
+        .hero-rose {
+            background: linear-gradient(135deg, #ffcdd2 0%, #ef5350 100%);
+        }
+
+        .pod-hero-image {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pod-hero-placeholder {
+            font-size: 15em;
+            filter: drop-shadow(0 15px 40px rgba(0,0,0,0.3));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .pod-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+            padding: 40px 20px 25px 20px;
+            color: white;
+        }
+
+        .pod-label {
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+            opacity: 0.95;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pod-title {
+            font-size: 2.8em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 3px 12px rgba(0,0,0,0.4);
+        }
+
+        .pod-subtitle {
+            font-size: 1em;
+            opacity: 0.95;
+            line-height: 1.5;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .rotation-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.95);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #2e7d32;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* AR Scan Button */
+        .ar-scan-btn {
+            margin: 20px;
+            padding: 20px;
+            background: white;
+            border: 4px solid #66bb6a;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+        }
+
+        .ar-scan-btn:hover {
+            background: #66bb6a;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(102,187,106,0.4);
+        }
+
+        .ar-scan-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .ar-scan-icon {
+            font-size: 2.5em;
+            background: #f5f5f5;
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ar-scan-btn:hover .ar-scan-icon {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .ar-scan-text {
+            text-align: left;
+        }
+
+        .ar-scan-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #2e7d32;
+        }
+
+        .ar-scan-btn:hover .ar-scan-title {
+            color: white;
+        }
+
+        .ar-scan-subtitle {
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        .ar-scan-btn:hover .ar-scan-subtitle {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .ar-scan-arrow {
+            font-size: 1.8em;
+            color: #66bb6a;
+        }
+
+        .ar-scan-btn:hover .ar-scan-arrow {
+            color: white;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 85px;
+            background: white;
+            border-top: 2px solid #e0e0e0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            flex: 1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            transform: scale(1.1);
+        }
+
+        .nav-icon {
+            font-size: 1.8em;
+            background: #f5f5f5;
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .nav-item.active .nav-icon {
+            background: #66bb6a;
+            color: white;
+        }
+
+        .nav-item.locked .nav-icon::after {
+            content: '🔒';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 0.6em;
+            background: white;
+            border-radius: 50%;
+            padding: 2px;
+        }
+
+        .nav-label {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .nav-item.active .nav-label {
+            color: #2e7d32;
+        }
+
+        /* Explore Screen */
+        .screen-header {
+            padding: 20px;
+            background: white;
+        }
+
+        .screen-title {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #2e7d32;
+            margin-bottom: 5px;
+        }
+
+        .screen-subtitle {
+            font-size: 1em;
+            color: #666;
+        }
+
+        .search-box {
+            margin: 0 20px 20px 20px;
+            padding: 15px 20px;
+            background: #f5f5f5;
+            border-radius: 20px;
+            border: 3px solid #e0e0e0;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-icon {
+            color: #999;
+            font-size: 1.3em;
+        }
+
+        .content-area {
+            padding: 0 20px 100px 20px;
+            overflow-y: auto;
+            height: calc(100% - 260px);
+        }
+
+        .plant-card {
+            background: white;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .plant-card:hover {
+            border-color: #66bb6a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102,187,106,0.3);
+        }
+
+        .plant-thumbnail {
+            width: 90px;
+            height: 90px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #81c784, #66bb6a);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+        }
+
+        .plant-info {
+            flex: 1;
+        }
+
+        .plant-name {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #2e7d32;
+            margin-bottom: 5px;
+        }
+
+        .season-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .season-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #81c784, #66bb6a);
+            border-radius: 4px;
+        }
+
+        /* My Garden Screen */
+        .sign-in-prompt {
+            text-align: center;
+            padding: 60px 30px;
+        }
+
+        .sign-in-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+
+        .sign-in-title {
+            font-size: 2em;
+            font-weight: 700;
+            color: #2e7d32;
+            margin-bottom: 15px;
+        }
+
+        .sign-in-description {
+            font-size: 1.1em;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .sign-in-btn {
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #66bb6a, #4caf50);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 1.3em;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(102,187,106,0.4);
+            transition: all 0.3s ease;
+        }
+
+        .sign-in-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 24px rgba(102,187,106,0.5);
+        }
+
+        .empty-garden {
+            text-align: center;
+            padding: 60px 30px;
+        }
+
+        .empty-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #2e7d32;
+            margin-bottom: 15px;
+        }
+
+        .empty-description {
+            font-size: 1.1em;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Teacher Dashboard */
+        .teacher-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #42a5f5, #1e88e5);
+            color: white;
+        }
+
+        .teacher-title {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .teacher-subtitle {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+
+        .class-card {
+            background: white;
+            border-radius: 20px;
+            margin: 15px 20px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 3px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .class-card:hover {
+            border-color: #42a5f5;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(66,165,245,0.3);
+        }
+
+        .class-name {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #1e88e5;
+            margin-bottom: 10px;
+        }
+
+        .class-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 15px;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: 700;
+            color: #1e88e5;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .screen-label {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #2e7d32;
+        }
+
+        .features-list {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            margin-top: 40px;
+        }
+
+        .features-list h2 {
+            color: #2e7d32;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .feature-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: #f5f5f5;
+            border-radius: 15px;
+            border-left: 5px solid #66bb6a;
+        }
+
+        .feature-item strong {
+            color: #2e7d32;
+            font-size: 1.1em;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #4caf50;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            margin-left: 10px;
+            font-weight: 600;
+        }
+
+        .badge-blue {
+            background: #42a5f5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌱 PlantAR - Final Wireframes</h1>
+        <p class="subtitle">Updated Navigation • My Garden with Sign-in • Teacher Dashboard</p>
+
+        <div class="screens-grid">
+            <!-- Screen 1: Landing Page with Branding -->
+            <div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <div class="status-bar">
+                            <span>9:41</span>
+                            <span>📶 📡 🔋</span>
+                        </div>
+                        
+                        <div class="app-logo-banner">
+                            <span class="logo-icon">🌱</span>
+                            <span class="logo-text">PlantAR</span>
+                        </div>
+                        
+                        <div class="plant-of-day-hero hero-sunflower" onclick="showPlantDetail()">
+                            <div class="rotation-indicator">
+                                <span>📅</span>
+                                <span>Changes daily</span>
+                            </div>
+                            <div class="pod-hero-image">
+                                <div class="pod-hero-placeholder">🌻</div>
+                            </div>
+                            <div class="pod-overlay">
+                                <div class="pod-label">
+                                    <span>🌟</span>
+                                    <span>PLANT OF THE DAY</span>
+                                </div>
+                                <div class="pod-title">Sunflower</div>
+                                <div class="pod-subtitle">
+                                    9,673 kids learning now • Tap to explore →
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ar-scan-btn">
+                            <div class="ar-scan-content">
+                                <div class="ar-scan-icon">📸</div>
+                                <div class="ar-scan-text">
+                                    <div class="ar-scan-title">Scan Any Plant</div>
+                                    <div class="ar-scan-subtitle">Point at a reference card</div>
+                                </div>
+                            </div>
+                            <div class="ar-scan-arrow">→</div>
+                        </div>
+
+                        <div class="bottom-nav">
+                            <div class="nav-item active">
+                                <div class="nav-icon">📸</div>
+                                <div class="nav-label">AR Scan</div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-icon">🌿</div>
+                                <div class="nav-label">Explore</div>
+                            </div>
+                            <div class="nav-item locked">
+                                <div class="nav-icon">🌱</div>
+                                <div class="nav-label">My Garden</div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-icon">⚙️</div>
+                                <div class="nav-label">Settings</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">1. Landing (AR Scan Tab Active)</div>
+            </div>
+
+            <!-- Screen 2: Explore - All Plants in Database -->
+            <div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <div class="status-bar">
+                            <span>9:41</span>
+                            <span>📶 📡 🔋</span>
+                        </div>
+                        
+                        <div class="screen-header">
+                            <div class="screen-title">Explore Plants</div>
+                            <div class="screen-subtitle">12 plants in our database</div>
+                        </div>
+
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <span style="color: #999;">Search plants...</span>
+                        </div>
+
+                        <div class="content-area" style="height: calc(100% - 260px);">
+                            <div class="plant-card">
+                                <div class="plant-thumbnail">🌻</div>
+                                <div class="plant-info">
+                                    <div class="plant-name">Sunflower</div>
+                                    <div style="color: #666; font-size: 0.95em;">Easy to learn</div>
+                                    <div class="season-bar">
+                                        <div class="season-fill" style="width: 75%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="plant-card">
+                                <div class="plant-thumbnail" style="background: linear-gradient(135deg, #ef5350, #f44336);">🌹</div>
+                                <div class="plant-info">
+                                    <div class="plant-name">Rose</div>
+                                    <div style="color: #666; font-size: 0.95em;">Medium difficulty</div>
+                                    <div class="season-bar">
+                                        <div class="season-fill" style="width: 60%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="plant-card">
+                                <div class="plant-thumbnail" style="background: linear-gradient(135deg, #64b5f6, #42a5f5);">🌸</div>
+                                <div class="plant-info">
+                                    <div class="plant-name">Cherry Blossom</div>
+                                    <div style="color: #666; font-size: 0.95em;">Easy to learn</div>
+                                    <div class="season-bar">
+                                        <div class="season-fill" style="width: 40%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="plant-card">
+                                <div class="plant-thumbnail" style="background: linear-gradient(135deg, #ba68c8, #9c27b0);">🌷</div>
+                                <div class="plant-info">
+                                    <div class="plant-name">Tulip</div>
+                                    <div style="color: #666; font-size: 0.95em;">Easy to learn</div>
+                                    <div class="season-bar">
+                                        <div class="season-fill" style="width: 50%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bottom-nav">
+                            <div class="nav-item">
+                                <div class="nav-icon">📸</div>
+                                <div class="nav-label">AR Scan</div>
+                            </div>
+                            <div class="nav-item active">
+                                <div class="nav-icon">🌿</div>
+                                <div class="nav-label">Explore</div>
+                            </div>
+                            <div class="nav-item locked">
+                                <div class="nav-icon">🌱</div>
+                                <div class="nav-label">My Garden</div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-icon">⚙️</div>
+                                <div class="nav-label">Settings</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">2. Explore (All Plants - No Sign-in)</div>
+            </div>
+
+            <!-- Screen 3: My Garden - Sign-in Required -->
+            <div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <div class="status-bar">
+                            <span>9:41</span>
+                            <span>📶 📡 🔋</span>
+                        </div>
+                        
+                        <div class="screen-header">
+                            <div class="screen-title">My Garden</div>
+                            <div class="screen-subtitle">Your scanned plants</div>
+                        </div>
+
+                        <div class="content-area" style="height: calc(100% - 240px);">
+                            <div class="sign-in-prompt">
+                                <div class="sign-in-icon">🔒</div>
+                                <div class="sign-in-title">Sign In to Save Plants</div>
+                                <div class="sign-in-description">
+                                    Create an account to save all the plants you scan and track your learning progress!
+                                </div>
+                                <button class="sign-in-btn">Sign In / Sign Up</button>
+                            </div>
+                        </div>
+
+                        <div class="bottom-nav">
+                            <div class="nav-item">
+                                <div class="nav-icon">📸</div>
+                                <div class="nav-label">AR Scan</div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-icon">🌿</div>
+                                <div class="nav-label">Explore</div>
+                            </div>
+                            <div class="nav-item active locked">
+                                <div class="nav-icon">🌱</div>
+                                <div class="nav-label">My Garden</div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-icon">⚙️</div>
+                                <div class="nav-label">Settings</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">3. My Garden (Before Sign-in)</div>
+            </div>
+
+            <!-- Screen 4: My Garden - After Sign-in -->
+            <div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <div class="status-bar">
+                            <span>9:41</span>
+                            <span>📶 📡 🔋</span>
+                        </div>
+                        
+                        <div class="screen-header">
+                            <div class="screen-title">My Garden</div>
+                            <div class="screen-subtitle">3 plants scanned • Logged in as Emma</div>
+                        </div>
+
+                        <div class="content-area" style="height: calc(100% - 240px);">
+                            <div class="plant-card">
+                                <div class="plant-thumbnail">🌻</div>
+                                <div class="plant-info">
+                                    <div class="plant-name">Sunflower</div>
+                                    <div style="color: #666; font-size: 0.95em;">✓ Quiz completed • 5/5 correct</div>
+                                    <div class="season-bar">
+                                        <div class="season-fill" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="plant-card">
+                                <div class="plant-thumbnail" style="background: linear-gradient(135deg, #ef5350, #f44336);">🌹</div>
+                                <div class="plant-info">
+                                    <div class="plant-name">Rose</div>
+                                    <div style="color: #666; font-size: 0.95em;">✓ Quiz completed • 4/5 correct</div>
+                                    <div class="season-bar">
+                                        <div class="season-fill" style="width: 80%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="plant-card">
+                                <div class="plant-thumbnail" style="background: linear-gradient(135deg, #64b5f6, #42a5f5);">🌸</div>
+                                <div class="plant-info">
+                                    <div class="plant-name">Cherry Blossom</div>
+                                    <div style="color: #ffa726; font-size: 0.95em;">⏳ Quiz not taken yet</div>
+                                    <div class="season-bar">
+                                        <div class="season-fill" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bottom-nav">
+                            <div class="nav-item">
+                                <div class="nav-icon">📸</div>
+                                <div class="nav-label">AR Scan</div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-icon">🌿</div>
+                                <div class="nav-label">Explore</div>
+                            </div>
+                            <div class="nav-item active">
+                                <div class="nav-icon">🌱</div>
+                                <div class="nav-label">My Garden</div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-icon">⚙️</div>
+                                <div class="nav-label">Settings</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">4. My Garden (Signed In - Scanned Plants)</div>
+            </div>
+
+            <!-- Screen 5: Settings with Teacher Login -->
+            <div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <div class="status-bar">
+                            <span>9:41</span>
+                            <span>📶 📡 🔋</span>
+                        </div>
+                        
+                        <div class="screen-header">
+                            <div class="screen-title">Settings</div>
+                        </div>
+
+                        <div class="content-area" style="height: calc(100% - 200px);">
+                            <!-- Account Section -->
+                            <div style="padding: 0 20px 10px 20px; color: #999; font-size: 0.9em; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Account</div>
+                            
+                            <div class="plant-card" style="margin: 0 20px 15px 20px; display: block; padding: 20px;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="font-size: 2.5em;">👤</div>
+                                    <div>
+                                        <div style="font-weight: 700; color: #2e7d32; font-size: 1.2em;">Emma Rodriguez</div>
+                                        <div style="color: #666; font-size: 0.95em;">emma.rodriguez@school.edu</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Teacher Section -->
+                            <div style="padding: 20px 20px 10px 20px; color: #999; font-size: 0.9em; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">For Teachers</div>
+                            
+                            <div class="plant-card" style="margin: 0 20px 15px 20px; background: linear-gradient(135deg, #e3f2fd, #bbdefb); border-color: #42a5f5;" onclick="showTeacherLogin()">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div style="font-size: 2.5em;">👩‍🏫</div>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 700; color: #1e88e5; font-size: 1.2em;">Teacher Dashboard</div>
+                                        <div style="color: #1565c0; font-size: 0.95em;">View student progress & grades</div>
+                                    </div>
+                                    <div style="font-size: 1.5em; color: #42a5f5;">→</div>
+                                </div>
+                            </div>
+
+                            <!-- App Settings Section -->
+                            <div style="padding: 20px 20px 10px 20px; color: #999; font-size: 0.9em; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">App Settings</div>
+                            
+                            <div style="background: white; margin: 0 20px; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                <div style="padding: 18px 20px; border-bottom: 2px solid #f5f5f5; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="font-weight: 600; color: #333;">Voiceover</div>
+                                        <div style="font-size: 0.9em; color: #999;">Read plant info aloud</div>
+                                    </div>
+                                    <div style="width: 50px; height: 28px; background: #66bb6a; border-radius: 20px; position: relative;">
+                                        <div style="width: 24px; height: 24px; background: white; border-radius: 50%; position: absolute; right: 2px; top: 2px;"></div>
+                                    </div>
+                                </div>
+                                
+                                <div style="padding: 18px 20px; border-bottom: 2px solid #f5f5f5; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="font-weight: 600; color: #333;">Text Size</div>
+                                        <div style="font-size: 0.9em; color: #999;">Large (for accessibility)</div>
+                                    </div>
+                                    <div style="color: #999; font-size: 1.2em;">→</div>
+                                </div>
+                                
+                                <div style="padding: 18px 20px; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="font-weight: 600; color: #333;">Notifications</div>
+                                        <div style="font-size: 0.9em; color: #999;">Daily plant reminders</div>
+                                    </div>
+                                    <div style="width: 50px; height: 28px; background: #e0e0e0; border-radius: 20px; position: relative;">
+                                        <div style="width: 24px; height: 24px; background: white; border-radius: 50%; position: absolute; left: 2px; top: 2px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- About Section -->
+                            <div style="padding: 20px 20px 10px 20px; color: #999; font-size: 0.9em; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">About</div>
+                            
+                            <div style="background: white; margin: 0 20px; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                <div style="padding: 18px 20px; border-bottom: 2px solid #f5f5f5;">
+                                    <div style="font-weight: 600; color: #333;">Privacy Policy</div>
+                                </div>
+                                <div style="padding: 18px 20px; border-bottom: 2px solid #f5f5f5;">
+                                    <div style="font-weight: 600; color: #333;">Terms of Service</div>
+                                </div>
+                                <div style="padding: 18px 20px;">
+                                    <div style="font-weight: 600; color: #333;">Version 1.0.0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bottom-nav">
+                            <div class="nav-item">
+                                <div class="nav-icon">📸</div>
+                                <div class="nav-label">AR Scan</div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-icon">🌿</div>
+                                <div class="nav-label">Explore</div>
+                            </div>
+                            <div class="nav-item locked">
+                                <div class="nav-icon">🌱</div>
+                                <div class="nav-label">My Garden</div>
+                            </div>
+                            <div class="nav-item active">
+                                <div class="nav-icon">⚙️</div>
+                                <div class="nav-label">Settings</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">5. Settings (Teacher Dashboard Access)</div>
+            </div>
+
+            <!-- Screen 6: Teacher Login Modal -->
+            <div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <div class="status-bar">
+                            <span>9:41</span>
+                            <span>📶 📡 🔋</span>
+                        </div>
+                        
+                        <div class="screen-header">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="font-size: 1.5em; cursor: pointer;">←</div>
+                                <div class="screen-title" style="font-size: 2em;">Teacher Login</div>
+                            </div>
+                        </div>
+
+                        <div class="content-area" style="height: calc(100% - 200px); padding: 40px 30px;">
+                            <div style="text-align: center; margin-bottom: 40px;">
+                                <div style="font-size: 5em; margin-bottom: 15px;">👩‍🏫</div>
+                                <div style="font-size: 1.8em; font-weight: 700; color: #1e88e5; margin-bottom: 10px;">Welcome, Teachers!</div>
+                                <div style="color: #666; font-size: 1.1em; line-height: 1.5;">
+                                    Sign in to view your classes and student progress
+                                </div>
+                            </div>
+
+                            <div style="background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                                <div style="margin-bottom: 20px;">
+                                    <div style="font-weight: 600; color: #333; margin-bottom: 8px;">Teacher Email</div>
+                                    <div style="padding: 15px; background: #f5f5f5; border-radius: 15px; border: 3px solid #e0e0e0; color: #999;">
+                                        teacher@school.edu
+                                    </div>
+                                </div>
+
+                                <div style="margin-bottom: 25px;">
+                                    <div style="font-weight: 600; color: #333; margin-bottom: 8px;">Password</div>
+                                    <div style="padding: 15px; background: #f5f5f5; border-radius: 15px; border: 3px solid #e0e0e0; color: #999;">
+                                        ••••••••
+                                    </div>
+                                </div>
+
+                                <button style="width: 100%; padding: 18px; background: linear-gradient(135deg, #42a5f5, #1e88e5); color: white; border: none; border-radius: 15px; font-size: 1.3em; font-weight: 700; cursor: pointer; box-shadow: 0 6px 16px rgba(66,165,245,0.4);" onclick="showTeacherDashboard()">
+                                    Sign In
+                                </button>
+                            </div>
+
+                            <div style="text-align: center; color: #666; font-size: 0.95em;">
+                                Need a teacher account? Contact your school administrator
+                            </div>
+                        </div>
+
+                        <div class="bottom-nav">
+                            <div class="nav-item">
+                                <div class="nav-icon">📸</div>
+                                <div class="nav-label">AR Scan</div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-icon">🌿</div>
+                                <div class="nav-label">Explore</div>
+                            </div>
+                            <div class="nav-item locked">
+                                <div class="nav-icon">🌱</div>
+                                <div class="nav-label">My Garden</div>
+                            </div>
+                            <div class="nav-item active">
+                                <div class="nav-icon">⚙️</div>
+                                <div class="nav-label">Settings</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">6. Teacher Login Screen</div>
+            </div>
+
+            <!-- Screen 7: Teacher Dashboard -->
+            <div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <div class="status-bar" style="color: white; background: transparent;">
+                            <span>9:41</span>
+                            <span>📶 📡 🔋</span>
+                        </div>
+
+                        <div class="teacher-header">
+                            <div class="teacher-title">👩‍🏫 Teacher Dashboard</div>
+                            <div class="teacher-subtitle">Welcome back, Ms. Johnson!</div>
+                        </div>
+
+                        <div class="content-area" style="height: calc(100% - 140px); padding-top: 0;">
+                            <div class="class-card">
+                                <div class="class-name">Period 3 - Science</div>
+                                <div style="color: #666; margin-bottom: 10px;">24 students • Grade 5</div>
+                                <div class="class-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-number">24</div>
+                                        <div class="stat-label">Students</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-number">87%</div>
+                                        <div class="stat-label">Avg. Score</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-number">8</div>
+                                        <div class="stat-label">Plants Learned</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="class-card">
+                                <div class="class-name">Period 5 - Biology</div>
+                                <div style="color: #666; margin-bottom: 10px;">28 students • Grade 6</div>
+                                <div class="class-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-number">28</div>
+                                        <div class="stat-label">Students</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-number">92%</div>
+                                        <div class="stat-label">Avg. Score</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-number">10</div>
+                                        <div class="stat-label">Plants Learned</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="class-card">
+                                <div class="class-name">Period 7 - Science Lab</div>
+                                <div style="color: #666; margin-bottom: 10px;">18 students • Grade 5</div>
+                                <div class="class-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-number">18</div>
+                                        <div class="stat-label">Students</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-number">79%</div>
+                                        <div class="stat-label">Avg. Score</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-number">6</div>
+                                        <div class="stat-label">Plants Learned</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bottom-nav">
+                            <div class="nav-item active">
+                                <div class="nav-icon">📊</div>
+                                <div class="nav-label">Classes</div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-icon">📝</div>
+                                <div class="nav-label">Reports</div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-icon">👥</div>
+                                <div class="nav-label">Students</div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-icon">⚙️</div>
+                                <div class="nav-label">Settings</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">7. Teacher Dashboard (After Login)</div>
+            </div>
+
+            <!-- Screen 6: Teacher - Student Detail -->
+            <div>
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <div class="status-bar" style="color: white; background: transparent;">
+                            <span>9:41</span>
+                            <span>📶 📡 🔋</span>
+                        </div>
+
+                        <div class="teacher-header">
+                            <div style="font-size: 1.2em; margin-bottom: 5px;">← Period 3 - Science</div>
+                            <div class="teacher-title">Emma Rodriguez</div>
+                            <div class="teacher-subtitle">Student ID: 2024-0573</div>
+                        </div>
+
+                        <div class="content-area" style="height: calc(100% - 140px); padding: 20px; padding-bottom: 100px;">
+                            <div style="background: white; padding: 20px; border-radius: 20px; margin-bottom: 20px;">
+                                <h3 style="color: #1e88e5; margin-bottom: 15px;">Overall Progress</h3>
+                                <div class="class-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-number">3</div>
+                                        <div class="stat-label">Plants Scanned</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-number">93%</div>
+                                        <div class="stat-label">Avg. Score</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-number">2</div>
+                                        <div class="stat-label">Quizzes Done</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="background: white; padding: 20px; border-radius: 20px;">
+                                <h3 style="color: #1e88e5; margin-bottom: 15px;">Quiz Results</h3>
+                                
+                                <div style="padding: 15px; background: #f5f5f5; border-radius: 15px; margin-bottom: 10px;">
+                                    <div style="font-weight: 700; color: #2e7d32; margin-bottom: 5px;">🌻 Sunflower</div>
+                                    <div style="color: #666; font-size: 0.95em;">Score: 5/5 (100%) • Dec 3, 2025</div>
+                                </div>
+
+                                <div style="padding: 15px; background: #f5f5f5; border-radius: 15px; margin-bottom: 10px;">
+                                    <div style="font-weight: 700; color: #2e7d32; margin-bottom: 5px;">🌹 Rose</div>
+                                    <div style="color: #666; font-size: 0.95em;">Score: 4/5 (80%) • Dec 2, 2025</div>
+                                </div>
+
+                                <div style="padding: 15px; background: #fff3cd; border-radius: 15px;">
+                                    <div style="font-weight: 700; color: #f57f17; margin-bottom: 5px;">🌸 Cherry Blossom</div>
+                                    <div style="color: #666; font-size: 0.95em;">Not taken yet</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bottom-nav">
+                            <div class="nav-item">
+                                <div class="nav-icon">📊</div>
+                                <div class="nav-label">Classes</div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-icon">📝</div>
+                                <div class="nav-label">Reports</div>
+                            </div>
+                            <div class="nav-item active">
+                                <div class="nav-icon">👥</div>
+                                <div class="nav-label">Students</div>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-icon">⚙️</div>
+                                <div class="nav-label">Settings</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">8. Teacher - Student Detail View</div>
+            </div>
+        </div>
+
+        <!-- Features List -->
+        <div class="features-list">
+            <h2>🎯 Final Design Features</h2>
+            
+            <div class="feature-item">
+                <strong>PlantAR Logo Banner</strong> <span class="badge">NEW</span><br>
+                Clean branding at top of every screen - just like Merlin Bird ID app
+            </div>
+
+            <div class="feature-item">
+                <strong>Reordered Navigation</strong> <span class="badge">UX</span><br>
+                AR Scan → Explore → My Garden → Settings (AR Scan is primary action)
+            </div>
+
+            <div class="feature-item">
+                <strong>My Garden with Sign-in</strong> <span class="badge">NEW</span><br>
+                Locked until user signs in - stores only plants they've personally scanned
+            </div>
+
+            <div class="feature-item">
+                <strong>Explore = All Plants</strong> <span class="badge">Database</span><br>
+                Browse entire plant library (12 plants) without needing to sign in
+            </div>
+
+            <div class="feature-item">
+                <strong>Quiz Tracking</strong> <span class="badge">Progress</span><br>
+                My Garden shows quiz scores and completion status for each scanned plant
+            </div>
+
+            <div class="feature-item">
+                <strong>Teacher Dashboard in Settings</strong> <span class="badge-blue badge">Smart</span><br>
+                Teachers access dashboard through Settings menu - same app, no separate download needed!
+            </div>
+
+            <div class="feature-item">
+                <strong>Separate Teacher Authentication</strong> <span class="badge-blue badge">Security</span><br>
+                Teachers use school email (@school.edu) to log in - keeps student data secure
+            </div>
+
+            <div class="feature-item">
+                <strong>Class Management</strong> <span class="badge-blue badge">Teacher</span><br>
+                Teachers can view multiple classes, student rosters, and aggregate statistics
+            </div>
+
+            <div class="feature-item">
+                <strong>Student Detail View</strong> <span class="badge-blue badge">Teacher</span><br>
+                Drill down into individual student progress: plants scanned, quiz scores, completion dates
+            </div>
+
+            <div class="feature-item">
+                <strong>Automatic Daily Rotation</strong> <span class="badge">Smart</span><br>
+                Plant of the Day changes every 24 hours based on day of year
+            </div>
+
+            <div class="feature-item">
+                <strong>Entire Card Clickable</strong> <span class="badge">Interactive</span><br>
+                Tap Plant of the Day hero image to open that plant's detail page
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showPlantDetail() {
+            alert('Opening Sunflower detail page with 3D model and interactive hotspots!');
+        }
+
+        function showTeacherLogin() {
+            alert('Teacher Login screen opens - same app, just a different auth flow!');
+        }
+
+        function showTeacherDashboard() {
+            alert('After successful teacher login, the app switches to Teacher Dashboard view with classes and student grades.');
+        }
+
+        // Add click feedback to all interactive elements
+        document.querySelectorAll('.plant-card, .nav-item, .ar-scan-btn, .sign-in-btn, .class-card').forEach(el => {
+            el.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 200);
+            });
+        });
+    </script>
+</body>
+</html>
+
+

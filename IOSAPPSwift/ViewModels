@@ -1,0 +1,359 @@
+import Foundation
+import Combine
+import SwiftUI
+
+// MARK: - Home ViewModel
+class HomeViewModel: ObservableObject {
+    @Published var showAboutModal = false
+    @Published var showScanner = false
+    @Published var showLibrary = false
+    
+    func handleScanTap() {
+        showScanner = true
+    }
+    
+    func handleLibraryTap() {
+        showLibrary = true
+    }
+    
+    func handleAboutTap() {
+        showAboutModal = true
+    }
+}
+
+// MARK: - Plant Library ViewModel
+class PlantLibraryViewModel: ObservableObject {
+    @Published var plants: [Plant] = []
+    @Published var filteredPlants: [Plant] = []
+    @Published var searchQuery: String = ""
+    @Published var sortBy: SortOption = .name
+    @Published var isLoading = false
+    @Published var error: AppError?
+    
+    private let contentProvider: ContentProvider
+    private var disposeBag = Set<AnyCancellable>()
+    
+    enum SortOption {
+        case name
+        case difficulty
+    }
+    
+    init(contentProvider: ContentProvider? = nil) {
+        self.contentProvider = contentProvider ?? ContentProvider()
+        setupBindings()
+        loadPlants()
+    }
+    
+    private func setupBindings() {
+        $searchQuery
+            .debounce(for: 0.3, scheduler: RunLoop.main)
+            .combineLatest($sortBy)
+            .sink { [weak self] _, _ in
+                self?.filterAndSort()
+            }
+            .store(in: &disposeBag)
+    }
+    
+    func loadPlants() {
+        isLoading = true
+        
+        Task {
+            do {
+                let plants = try await contentProvider.getAvailablePlantsAsync()
+                DispatchQueue.main.async {
+                    self.plants = plants
+                    self.filterAndSort()
+                    self.isLoading = false
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.error = AppError("Failed to load plants")
+                    self.isLoading = false
+                }
+            }
+        }
+    }
+    
+    private func filterAndSort() {
+        var filtered = plants
+        
+        if !searchQuery.isEmpty {
+            filtered = filtered.filter {
+                $0.displayName.localizedCaseInsensitiveContains(searchQuery)
+            }
+        }
+        
+        switch sortBy {
+        case .name:
+            filtered.sort { $0.displayName < $1.displayName }
+        case .difficulty:
+            filtered.sort { $0.difficultyLevel < $1.difficultyLevel }
+        }
+        
+        filteredPlants = filtered
+    }
+}
+
+// MARK: - AR Scanner ViewModel
+class ARScannerViewModel: NSObject, ObservableObject {
+    @Published var status: ARStatus = .searching
+    @Published var detectedPlant: Plant?
+    @Published var plantParts: [PlantPart] = []
+    @Published var selectedPart: PlantPart?
+    @Published var showPartsLabels = false
+    @Published var showQuiz = false
+    @Published var showToast: Toast?
+    
+    private let contentProvider: ContentProvider
+    private let arService: ARService
+    private let audioService: AudioService
+    private var simulationTimer: Timer?
+    
+    init(
+        contentProvider: ContentProvider? = nil,
+        arService: ARService? = nil,
+        audioService: AudioService? = nil
+    ) {
+        self.contentProvider = contentProvider ?? ContentProvider()
+        self.arService = arService ?? ARService()
+        self.audioService = audioService ?? AudioService()
+        
+        super.init()
+    }
+    
+    func startScanning(plantId: String? = nil) {
+        status = .searching
+        arService.startARSession()
+        
+        // Simulate detection
+        simulationTimer = Timer.scheduledTimer(withTimeInterval: 2.5, repeats: false) { [weak self] _ in
+            Task {
+                await self?.detectPlant(plantId: plantId ?? "daisy")
+            }
+        }
+    }
+    
+    func detectPlant(plantId: String) async {
+        status = .loading
+        
+        do {
+            let plant = try await contentProvider.getPlantAsync(plantId)
+            let parts = try await contentProvider.getPlantPartsAsync(plantId)
+            
+            DispatchQueue.main.async {
+                self.detectedPlant = plant
+                self.plantParts = parts
+                self.status = .active(plant)
+                
+                self.showToast = Toast(
+                    message: "Detected: \(plant.displayName)",
+                    type: .success,
+                    duration: 2.0
+                )
+                
+                UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+            }
+        } catch {
+            DispatchQueue.main.async {
+                self.status = .error("Failed to load plant")
+                self.showToast = Toast(
+                    message: "Failed to load plant",
+                    type: .error,
+                    duration: 3.0
+                )
+            }
+        }
+    }
+    
+    func handlePartTap(_ part: PlantPart) {
+        selectedPart = part
+    }
+    
+    func togglePartLabels() {
+        showPartsLabels.toggle()
+    }
+    
+    func rescan() {
+        simulationTimer?.invalidate()
+        detectedPlant = nil
+        plantParts = []
+        selectedPart = nil
+        showPartsLabels = false
+        showQuiz = false
+        arService.pauseARSession()
+        
+        startScanning()
+    }
+    
+    deinit {
+        simulationTimer?.invalidate()
+        arService.pauseARSession()
+    }
+}
+
+// MARK: - Plant Detail ViewModel
+class PlantDetailViewModel: ObservableObject {
+    @Published var plant: Plant?
+    @Published var plantParts: [PlantPart] = []
+    @Published var quizQuestions: [QuizQuestion] = []
+    @Published var isLoading = false
+    @Published var error: AppError?
+    
+    private let contentProvider: ContentProvider
+    
+    init(plantId: String, contentProvider: ContentProvider? = nil) {
+        self.contentProvider = contentProvider ?? ContentProvider()
+        loadPlantDetails(plantId: plantId)
+    }
+    
+    func loadPlantDetails(plantId: String) {
+        isLoading = true
+        
+        Task {
+            do {
+                async let plant = contentProvider.getPlantAsync(plantId)
+                async let parts = contentProvider.getPlantPartsAsync(plantId)
+                
+                let fetchedPlant = try await plant
+                let fetchedParts = try await parts
+                
+                DispatchQueue.main.async {
+                    self.plant = fetchedPlant
+                    self.plantParts = fetchedParts
+                    self.isLoading = false
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.error = AppError("Failed to load plant details")
+                    self.isLoading = false
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Quiz ViewModel
+class QuizViewModel: ObservableObject {
+    @Published var questions: [QuizQuestion] = []
+    @Published var currentIndex = 0
+    @Published var userAnswers: [String: String] = [:]
+    @Published var score = 0
+    @Published var showResults = false
+    @Published var isLoading = false
+    @Published var error: AppError?
+    @Published var selectedAnswer: String?
+    @Published var showFeedback = false
+    @Published var feedbackType: FeedbackType = .correct
+    
+    enum FeedbackType {
+        case correct
+        case incorrect
+    }
+    
+    private let contentProvider: ContentProvider
+    private let plantId: String
+    
+    init(plantId: String, contentProvider: ContentProvider? = nil) {
+        self.plantId = plantId
+        self.contentProvider = contentProvider ?? ContentProvider()
+        loadQuestions()
+    }
+    
+    func loadQuestions() {
+        isLoading = true
+        
+        Task {
+            do {
+                let questions = try await contentProvider.startQuizAsync(plantId)
+                DispatchQueue.main.async {
+                    self.questions = questions
+                    self.isLoading = false
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.error = AppError("Failed to load quiz questions")
+                    self.isLoading = false
+                }
+            }
+        }
+    }
+    
+    func submitAnswer(_ answer: String) {
+        selectedAnswer = answer
+        let currentQuestion = questions[currentIndex]
+        let isCorrect = answer == currentQuestion.correctAnswerId
+        
+        feedbackType = isCorrect ? .correct : .incorrect
+        showFeedback = true
+        
+        if isCorrect && userAnswers[currentQuestion.questionId] == nil {
+            score += 1
+        }
+        
+        userAnswers[currentQuestion.questionId] = answer
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            self?.advanceQuestion()
+        }
+    }
+    
+    func advanceQuestion() {
+        if currentIndex < questions.count - 1 {
+            currentIndex += 1
+            selectedAnswer = nil
+            showFeedback = false
+        } else {
+            completeQuiz()
+        }
+    }
+    
+    func completeQuiz() {
+        Task {
+            do {
+                let answers = questions.map { question in
+                    QuestionAnswer(
+                        questionId: question.questionId,
+                        userAnswer: userAnswers[question.questionId] ?? "",
+                        isCorrect: (userAnswers[question.questionId] ?? "") == question.correctAnswerId
+                    )
+                }
+                
+                let result = try await contentProvider.completeQuizAsync(plantId: plantId, answers: answers)
+                
+                DispatchQueue.main.async {
+                    self.showResults = true
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.error = AppError("Failed to save quiz results")
+                }
+            }
+        }
+    }
+    
+    func retakeQuiz() {
+        currentIndex = 0
+        userAnswers = [:]
+        score = 0
+        showResults = false
+        selectedAnswer = nil
+        showFeedback = false
+        
+        loadQuestions()
+    }
+    x
+    var currentQuestion: QuizQuestion? {
+        guard currentIndex < questions.count else { return nil }
+        return questions[currentIndex]
+    }
+    
+    var progressPercentage: Double {
+        guard !questions.isEmpty else { return 0 }
+        return Double(currentIndex + 1) / Double(questions.count)
+    }
+    
+    var percentage: Double {
+        guard !questions.isEmpty else { return 0 }
+        return Double(score) / Double(questions.count) * 100
+    }
+}

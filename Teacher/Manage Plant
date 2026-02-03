@@ -1,0 +1,142 @@
+// src/components/teacher/ManagePlants.jsx
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useMemo, useState } from "react";
+
+import plantsJSON from "@/data/plants.json";
+import { addRecord, deleteRecord, loadData, updateRecord } from "@/utils/localDB";
+
+export default function ManagePlants() {
+  const [editingPlant, setEditingPlant] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+
+  const plants = useMemo(
+    () => loadData("plants", plantsJSON),
+    [showForm, editingPlant]
+  );
+
+  const [form, setForm] = useState({
+    id: "",
+    name: "",
+    scientific_name: "",
+    description: "",
+    image_url: "",
+    fun_facts: ""
+  });
+
+  function openEdit(plant) {
+    setForm({
+      id: plant.id,
+      name: plant.name,
+      scientific_name: plant.scientific_name,
+      description: plant.description,
+      image_url: plant.image_url,
+      fun_facts: (plant.fun_facts || []).join("\n")
+    });
+    setEditingPlant(true);
+    setShowForm(true);
+  }
+
+  function openCreate() {
+    setForm({
+      id: `plant-${Date.now()}`,
+      name: "",
+      scientific_name: "",
+      description: "",
+      image_url: "",
+      fun_facts: ""
+    });
+    setEditingPlant(false);
+    setShowForm(true);
+  }
+
+  function savePlant() {
+    const payload = {
+      id: form.id,
+      name: form.name,
+      scientific_name: form.scientific_name,
+      description: form.description,
+      image_url: form.image_url,
+      fun_facts: form.fun_facts.split("\n").filter(Boolean)
+    };
+
+    if (editingPlant) {
+      updateRecord("plants", payload, plantsJSON);
+    } else {
+      addRecord("plants", payload, plantsJSON);
+    }
+
+    setShowForm(false);
+  }
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Manage Plants</h2>
+        <Button className="bg-green-600" onClick={openCreate}>Add Plant</Button>
+      </div>
+
+      {!showForm && plants.length === 0 && (
+        <p className="text-slate-400">No plants found. Add one!</p>
+      )}
+
+      {!showForm && (
+        <div className="grid md:grid-cols-3 gap-4">
+          {plants.map((plant) => (
+            <Card key={plant.id} className="bg-slate-800 border-slate-700">
+              <img
+                src={plant.image_url}
+                className="w-full h-32 object-cover rounded-t-lg"
+              />
+              <CardContent className="p-4">
+                <h3 className="font-semibold">{plant.name}</h3>
+                <p className="text-xs italic text-teal-400">{plant.scientific_name}</p>
+                <p className="text-sm text-slate-400 mt-2 line-clamp-2">{plant.description}</p>
+
+                <div className="flex gap-2 mt-4">
+                  <Button variant="outline" className="border-slate-600 text-xs" onClick={() => openEdit(plant)}>
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="border-red-600 text-red-400 text-xs"
+                    onClick={() => deleteRecord("plants", plant.id, plantsJSON)}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {showForm && (
+        <Card className="bg-slate-800 border-slate-700 p-4">
+          <CardTitle className="mb-4">{editingPlant ? "Edit Plant" : "Add Plant"}</CardTitle>
+
+          <div className="space-y-3">
+            <Input value={form.name} placeholder="Name"
+              onChange={(e)=>setForm({...form, name:e.target.value})} />
+            <Input value={form.scientific_name} placeholder="Scientific Name"
+              onChange={(e)=>setForm({...form, scientific_name:e.target.value})} />
+            <Textarea value={form.description} placeholder="Description"
+              onChange={(e)=>setForm({...form, description:e.target.value})} />
+            <Input value={form.image_url} placeholder="Image URL"
+              onChange={(e)=>setForm({...form, image_url:e.target.value})} />
+            <Textarea value={form.fun_facts} placeholder="Fun Facts (one per line)"
+              onChange={(e)=>setForm({...form, fun_facts:e.target.value})} />
+
+            <div className="flex gap-2 pt-3">
+              <Button className="bg-blue-600" onClick={savePlant}>Save</Button>
+              <Button variant="outline" className="border-slate-600" onClick={()=>setShowForm(false)}>Cancel</Button>
+            </div>
+          </div>
+        </Card>
+      )}
+    </div>
+  );
+}

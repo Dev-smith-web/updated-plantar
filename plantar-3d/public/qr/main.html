@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./style.css" />
+  <title>Sunflower Info</title>
+  <style>
+    #popup { display:none; background:white; border-radius:10px; padding:20px; margin-top:20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Sunflower</h1>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/4/40/Sunflower_sky_backdrop.jpg" width="100%" />
+    <p>Tap a part to learn more:</p>
+    <button onclick="showInfo('Root')">Root</button>
+    <button onclick="showInfo('Stem')">Stem</button>
+    <button onclick="showInfo('Leaf')">Leaf</button>
+    <button onclick="showInfo('Flower')">Flower</button>
+
+    <div id="popup"></div>
+    <button onclick="goBack()">Back to Scanner</button>
+  </div>
+
+  <script>
+    function showInfo(part){
+      const data={
+        Root:"Roots absorb water and minerals from the soil.",
+        Stem:"The stem supports the plant and moves nutrients.",
+        Leaf:"Leaves make food using sunlight (photosynthesis).",
+        Flower:"Flowers help the plant reproduce."
+      };
+      const box=document.getElementById('popup');
+      box.innerHTML="<strong>"+part+"</strong><p>"+data[part]+"</p>";
+      box.style.display='block';
+    }
+    function goBack(){
+      window.location.href="index.html";
+    }
+  </script>
+</body>
+</html>

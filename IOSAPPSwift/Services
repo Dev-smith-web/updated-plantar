@@ -1,0 +1,432 @@
+import Foundation
+import Combine
+import AVFoundation
+import ARKit
+import RealityKit
+
+// MARK: - Content Provider Interface
+protocol IContentProvider {
+    func getAvailablePlantsAsync() async throws -> [Plant]
+    func getPlantAsync(_ plantId: String) async throws -> Plant
+    func getPlantPartsAsync(_ plantId: String) async throws -> [PlantPart]
+    func startQuizAsync(_ plantId: String) async throws -> [QuizQuestion]
+    func submitAnswerAsync(questionId: String, answer: String) async throws -> AnswerResponse
+    func completeQuizAsync(plantId: String, answers: [QuestionAnswer]) async throws -> QuizResult
+}
+
+// MARK: - Content Provider Implementation (Local Mock Data)
+class ContentProvider: IContentProvider {
+    private let mockDataService = MockDataService()
+    
+    func getAvailablePlantsAsync() async throws -> [Plant] {
+        try await Task.sleep(nanoseconds: 500_000_000)
+        return mockDataService.getAllPlants()
+    }
+    
+    func getPlantAsync(_ plantId: String) async throws -> Plant {
+        try await Task.sleep(nanoseconds: 300_000_000)
+        guard let plant = mockDataService.getPlant(id: plantId) else {
+            throw AppError("Plant not found")
+        }
+        return plant
+    }
+    
+    func getPlantPartsAsync(_ plantId: String) async throws -> [PlantPart] {
+        try await Task.sleep(nanoseconds: 300_000_000)
+        return mockDataService.getPlantParts(plantId: plantId)
+    }
+    
+    func startQuizAsync(_ plantId: String) async throws -> [QuizQuestion] {
+        try await Task.sleep(nanoseconds: 500_000_000)
+        let questions = mockDataService.getQuizQuestions(plantId: plantId)
+        return Array(questions.shuffled().prefix(10))
+    }
+    
+    func submitAnswerAsync(questionId: String, answer: String) async throws -> AnswerResponse {
+        try await Task.sleep(nanoseconds: 100_000_000)
+        return mockDataService.validateAnswer(questionId: questionId, answer: answer)
+    }
+    
+    func completeQuizAsync(plantId: String, answers: [QuestionAnswer]) async throws -> QuizResult {
+        try await Task.sleep(nanoseconds: 200_000_000)
+        
+        let score = answers.filter { $0.isCorrect }.count
+        let percentage = Double(score) / Double(answers.count) * 100.0
+        
+        return QuizResult(
+            score: score,
+            totalQuestions: answers.count,
+            percentage: percentage,
+            performanceMessage: getPerformanceMessage(percentage: percentage)
+        )
+    }
+    
+    private func getPerformanceMessage(percentage: Double) -> String {
+        if percentage >= 90 {
+            return "🌟 Outstanding! You're a plant expert!"
+        } else if percentage >= 70 {
+            return "🌱 Great job! You know your plants!"
+        } else if percentage >= 50 {
+            return "📚 Good effort! Keep learning!"
+        } else {
+            return "💪 Learn more about plants and try again!"
+        }
+    }
+}
+
+// MARK: - Answer Response
+struct AnswerResponse: Codable {
+    let isCorrect: Bool
+    let correctAnswer: String
+    let hint: String?
+}
+
+// MARK: - Quiz Result
+struct QuizResult {
+    let score: Int
+    let totalQuestions: Int
+    let percentage: Double
+    let performanceMessage: String
+}
+
+// MARK: - Mock Data Service
+class MockDataService {
+    func getAllPlants() -> [Plant] {
+        return [
+            Plant(
+                id: "1",
+                plantId: "daisy",
+                displayName: "Common Daisy",
+                description: "A cheerful wildflower with white petals and a yellow center. Daisies are perennials that grow in meadows and grasslands.",
+                referenceImageUrl: "daisy",
+                modelUrl: "daisy",
+                nativeSize: 0.1,
+                difficultyLevel: 2
+            ),
+            Plant(
+                id: "2",
+                plantId: "sunflower",
+                displayName: "Sunflower",
+                description: "A tall, bright yellow flower that follows the sun. Sunflowers grow to 6-12 feet tall and produce seeds.",
+                referenceImageUrl: "sunflower",
+                modelUrl: "sunflower",
+                nativeSize: 0.12,
+                difficultyLevel: 3
+            ),
+            Plant(
+                id: "3",
+                plantId: "rose",
+                displayName: "Garden Rose",
+                description: "A classic ornamental flower known for its beauty and fragrance. Roses come in many colors.",
+                referenceImageUrl: "rose",
+                modelUrl: "rose",
+                nativeSize: 0.08,
+                difficultyLevel: 3
+            )
+        ]
+    }
+    
+    func getPlant(id: String) -> Plant? {
+        return getAllPlants().first { $0.plantId == id }
+    }
+    
+    func getPlantParts(plantId: String) -> [PlantPart] {
+        switch plantId {
+        case "daisy":
+            return [
+                PlantPart(id: "1", partId: "daisy_stem", plantId: "daisy", partName: "Stem",
+                    definition: "The main green structure supporting the flower and leaves.",
+                    functionDescription: "Transports water and nutrients from roots to leaves and flowers.",
+                    iconUrl: nil, narrationAudioUrl: nil, meshPath: nil, anchorPointPath: nil),
+                PlantPart(id: "2", partId: "daisy_root", plantId: "daisy", partName: "Root",
+                    definition: "Underground structure that anchors the plant.",
+                    functionDescription: "Absorbs water and minerals from soil.",
+                    iconUrl: nil, narrationAudioUrl: nil, meshPath: nil, anchorPointPath: nil),
+                PlantPart(id: "3", partId: "daisy_leaf", plantId: "daisy", partName: "Leaf",
+                    definition: "Green flat structures that absorb sunlight.",
+                    functionDescription: "Converts sunlight into food through photosynthesis.",
+                    iconUrl: nil, narrationAudioUrl: nil, meshPath: nil, anchorPointPath: nil),
+                PlantPart(id: "4", partId: "daisy_flower", plantId: "daisy", partName: "Flower",
+                    definition: "The colorful part with white petals and yellow center.",
+                    functionDescription: "Attracts bees and butterflies for pollination.",
+                    iconUrl: nil, narrationAudioUrl: nil, meshPath: nil, anchorPointPath: nil),
+                PlantPart(id: "5", partId: "daisy_pistil", plantId: "daisy", partName: "Center/Pistil",
+                    definition: "The yellow center of the flower containing reproductive organs.",
+                    functionDescription: "Produces pollen and seeds after successful pollination.",
+                    iconUrl: nil, narrationAudioUrl: nil, meshPath: nil, anchorPointPath: nil)
+            ]
+        case "sunflower":
+            return [
+                PlantPart(id: "1", partId: "sunflower_stalk", plantId: "sunflower", partName: "Stalk",
+                    definition: "The thick, sturdy main stem.", functionDescription: "Supports the heavy flower head.",
+                    iconUrl: nil, narrationAudioUrl: nil, meshPath: nil, anchorPointPath: nil),
+                PlantPart(id: "2", partId: "sunflower_leaf", plantId: "sunflower", partName: "Leaf",
+                    definition: "Large green leaves much bigger than daisy leaves.",
+                    functionDescription: "Converts sunlight to food.",
+                    iconUrl: nil, narrationAudioUrl: nil, meshPath: nil, anchorPointPath: nil),
+                PlantPart(id: "3", partId: "sunflower_head", plantId: "sunflower", partName: "Flower Head",
+                    definition: "A large circular flower head.",
+                    functionDescription: "Follows the sun. Attracts pollinators.",
+                    iconUrl: nil, narrationAudioUrl: nil, meshPath: nil, anchorPointPath: nil),
+                PlantPart(id: "4", partId: "sunflower_seeds", plantId: "sunflower", partName: "Seeds",
+                    definition: "Hundreds of seeds in the center.",
+                    functionDescription: "Food for birds and humans.",
+                    iconUrl: nil, narrationAudioUrl: nil, meshPath: nil, anchorPointPath: nil),
+                PlantPart(id: "5", partId: "sunflower_petal", plantId: "sunflower", partName: "Petals",
+                    definition: "Bright yellow petals surrounding the seed center.",
+                    functionDescription: "Attracts pollinators with color.",
+                    iconUrl: nil, narrationAudioUrl: nil, meshPath: nil, anchorPointPath: nil)
+            ]
+        case "rose":
+            return [
+                PlantPart(id: "1", partId: "rose_stem", plantId: "rose", partName: "Stem",
+                    definition: "Green stem covered with thorns.",
+                    functionDescription: "Transports water and nutrients.",
+                    iconUrl: nil, narrationAudioUrl: nil, meshPath: nil, anchorPointPath: nil),
+                PlantPart(id: "2", partId: "rose_thorn", plantId: "rose", partName: "Thorns",
+                    definition: "Sharp prickles on the stem.",
+                    functionDescription: "Protects the plant from predators.",
+                    iconUrl: nil, narrationAudioUrl: nil, meshPath: nil, anchorPointPath: nil),
+                PlantPart(id: "3", partId: "rose_leaf", plantId: "rose", partName: "Leaf",
+                    definition: "Medium-sized green leaves.",
+                    functionDescription: "Performs photosynthesis.",
+                    iconUrl: nil, narrationAudioUrl: nil, meshPath: nil, anchorPointPath: nil),
+                PlantPart(id: "4", partId: "rose_petal", plantId: "rose", partName: "Petals",
+                    definition: "Soft, delicate petals that layer.",
+                    functionDescription: "Attracts pollinators with color.",
+                    iconUrl: nil, narrationAudioUrl: nil, meshPath: nil, anchorPointPath: nil)
+            ]
+        default:
+            return []
+        }
+    }
+    
+    func getQuizQuestions(plantId: String) -> [QuizQuestion] {
+        switch plantId {
+        case "daisy":
+            return [
+                QuizQuestion(id: "1", questionId: "q1", plantId: "daisy", type: "IdentifyPart",
+                    promptText: "What is the green part that supports the flower?",
+                    correctAnswerId: "Stem", choices: ["Stem", "Root", "Leaf", "Flower"],
+                    hint: "It's above ground", difficulty: 1),
+                QuizQuestion(id: "2", questionId: "q2", plantId: "daisy", type: "IdentifyFunction",
+                    promptText: "Which part absorbs water from the soil?",
+                    correctAnswerId: "Root", choices: ["Stem", "Root", "Leaf", "Flower"],
+                    hint: "It's underground", difficulty: 1),
+                QuizQuestion(id: "3", questionId: "q3", plantId: "daisy", type: "TrueFalse",
+                    promptText: "Roots are always visible above ground.",
+                    correctAnswerId: "False", choices: ["True", "False"],
+                    hint: "Most roots grow underground", difficulty: 1),
+                QuizQuestion(id: "4", questionId: "q4", plantId: "daisy", type: "IdentifyPart",
+                    promptText: "Which part is bright white with a yellow center?",
+                    correctAnswerId: "Flower", choices: ["Stem", "Root", "Leaf", "Flower"],
+                    hint: "This is the most beautiful part", difficulty: 2),
+                QuizQuestion(id: "5", questionId: "q5", plantId: "daisy", type: "IdentifyFunction",
+                    promptText: "Which part converts sunlight into food?",
+                    correctAnswerId: "Leaf", choices: ["Stem", "Root", "Leaf", "Flower"],
+                    hint: "It's green and flat", difficulty: 2),
+                QuizQuestion(id: "6", questionId: "q6", plantId: "daisy", type: "TrueFalse",
+                    promptText: "Daisies need sunlight to grow.",
+                    correctAnswerId: "True", choices: ["True", "False"],
+                    hint: "All plants need sunlight", difficulty: 1),
+                QuizQuestion(id: "7", questionId: "q7", plantId: "daisy", type: "IdentifyPart",
+                    promptText: "What is the yellow center of the daisy?",
+                    correctAnswerId: "Center/Pistil", choices: ["Stem", "Root", "Sepal", "Center/Pistil"],
+                    hint: "It's in the middle", difficulty: 2),
+                QuizQuestion(id: "8", questionId: "q8", plantId: "daisy", type: "IdentifyFunction",
+                    promptText: "What does the stem transport?",
+                    correctAnswerId: "Water and nutrients", choices: ["Sunlight", "Water", "Water and nutrients", "Seeds"],
+                    hint: "Think about how water gets to the flower", difficulty: 2),
+                QuizQuestion(id: "9", questionId: "q9", plantId: "daisy", type: "TrueFalse",
+                    promptText: "Flowers attract bees for pollination.",
+                    correctAnswerId: "True", choices: ["True", "False"],
+                    hint: "Bees help flowers make seeds", difficulty: 1),
+                QuizQuestion(id: "10", questionId: "q10", plantId: "daisy", type: "IdentifyFunction",
+                    promptText: "Which part stores food for the plant?",
+                    correctAnswerId: "Root", choices: ["Stem", "Root", "Leaf", "Flower"],
+                    hint: "Underground storage", difficulty: 2)
+            ]
+        case "sunflower":
+            return [
+                QuizQuestion(id: "1", questionId: "s1", plantId: "sunflower", type: "IdentifyPart",
+                    promptText: "What is the thick main stem called?",
+                    correctAnswerId: "Stalk", choices: ["Stem", "Stalk", "Trunk", "Branch"],
+                    hint: "It's thicker than a regular stem", difficulty: 1),
+                QuizQuestion(id: "2", questionId: "s2", plantId: "sunflower", type: "TrueFalse",
+                    promptText: "Sunflowers can grow up to 12 feet tall.",
+                    correctAnswerId: "True", choices: ["True", "False"],
+                    hint: "They are very tall plants", difficulty: 1),
+                QuizQuestion(id: "3", questionId: "s3", plantId: "sunflower", type: "IdentifyFunction",
+                    promptText: "What does heliotropism mean?",
+                    correctAnswerId: "Following the sun", choices: ["Growing roots", "Following the sun", "Attracting bees", "Storing water"],
+                    hint: "It's unique to sunflowers", difficulty: 2),
+                QuizQuestion(id: "4", questionId: "s4", plantId: "sunflower", type: "IdentifyPart",
+                    promptText: "Where are the sunflower seeds located?",
+                    correctAnswerId: "Seeds", choices: ["Petals", "Stem", "Seeds", "Leaves"],
+                    hint: "In the center of the flower", difficulty: 1),
+                QuizQuestion(id: "5", questionId: "s5", plantId: "sunflower", type: "TrueFalse",
+                    promptText: "Sunflower seeds can be eaten by humans.",
+                    correctAnswerId: "True", choices: ["True", "False"],
+                    hint: "They are nutritious", difficulty: 1),
+                QuizQuestion(id: "6", questionId: "s6", plantId: "sunflower", type: "IdentifyFunction",
+                    promptText: "How many tiny flowers make up a sunflower head?",
+                    correctAnswerId: "Hundreds", choices: ["Tens", "Hundreds", "Thousands", "Millions"],
+                    hint: "It's a lot of small flowers", difficulty: 2),
+                QuizQuestion(id: "7", questionId: "s7", plantId: "sunflower", type: "IdentifyPart",
+                    promptText: "What color are sunflower petals?",
+                    correctAnswerId: "Yellow", choices: ["Red", "Blue", "Yellow", "Purple"],
+                    hint: "Think of the sun", difficulty: 1),
+                QuizQuestion(id: "8", questionId: "s8", plantId: "sunflower", type: "TrueFalse",
+                    promptText: "Sunflower roots are shallow.",
+                    correctAnswerId: "False", choices: ["True", "False"],
+                    hint: "They need strong roots", difficulty: 2),
+                QuizQuestion(id: "9", questionId: "s9", plantId: "sunflower", type: "IdentifyFunction",
+                    promptText: "Why does sunflower follow the sun?",
+                    correctAnswerId: "Maximize sunlight", choices: ["Stay warm", "Find water", "Maximize sunlight", "Attract bees"],
+                    hint: "It helps the plant make energy", difficulty: 2),
+                QuizQuestion(id: "10", questionId: "s10", plantId: "sunflower", type: "IdentifyPart",
+                    promptText: "Which leaves are larger - daisy or sunflower?",
+                    correctAnswerId: "Sunflower", choices: ["Daisy", "Sunflower", "Same size", "Neither"],
+                    hint: "Bigger plants have bigger leaves", difficulty: 2)
+            ]
+        case "rose":
+            return [
+                QuizQuestion(id: "1", questionId: "r1", plantId: "rose", type: "IdentifyPart",
+                    promptText: "What are the sharp pointed structures on rose stems?",
+                    correctAnswerId: "Thorns", choices: ["Leaves", "Thorns", "Branches", "Roots"],
+                    hint: "They can prick your finger", difficulty: 1),
+                QuizQuestion(id: "2", questionId: "r2", plantId: "rose", type: "IdentifyFunction",
+                    promptText: "Why do roses have thorns?",
+                    correctAnswerId: "Protect from predators", choices: ["Attract insects", "Store water", "Protect from predators", "Produce food"],
+                    hint: "It's a defense mechanism", difficulty: 1),
+                QuizQuestion(id: "3", questionId: "r3", plantId: "rose", type: "TrueFalse",
+                    promptText: "Roses can only be red.",
+                    correctAnswerId: "False", choices: ["True", "False"],
+                    hint: "They come in many colors", difficulty: 1),
+                QuizQuestion(id: "4", questionId: "r4", plantId: "rose", type: "IdentifyPart",
+                    promptText: "What is the green part under the petals?",
+                    correctAnswerId: "Sepal", choices: ["Leaf", "Thorn", "Sepal", "Root"],
+                    hint: "It protects the flower bud", difficulty: 2),
+                QuizQuestion(id: "5", questionId: "r5", plantId: "rose", type: "IdentifyFunction",
+                    promptText: "What do roses emit that smells beautiful?",
+                    correctAnswerId: "Fragrance", choices: ["Pollen", "Nectar", "Fragrance", "Sap"],
+                    hint: "It's how you smell a rose", difficulty: 1),
+                QuizQuestion(id: "6", questionId: "r6", plantId: "rose", type: "TrueFalse",
+                    promptText: "Roses have serrated edges on leaves.",
+                    correctAnswerId: "True", choices: ["True", "False"],
+                    hint: "Look at a rose leaf closely", difficulty: 2),
+                QuizQuestion(id: "7", questionId: "r7", plantId: "rose", type: "IdentifyPart",
+                    promptText: "How many layers of petals do roses have?",
+                    correctAnswerId: "Multiple", choices: ["One", "Two", "Multiple", "None"],
+                    hint: "You peel them off one by one", difficulty: 2),
+                QuizQuestion(id: "8", questionId: "r8", plantId: "rose", type: "IdentifyFunction",
+                    promptText: "What is the main purpose of petals?",
+                    correctAnswerId: "Attract pollinators", choices: ["Store water", "Create shade", "Attract pollinators", "Produce oxygen"],
+                    hint: "Beauty serves a purpose", difficulty: 2),
+                QuizQuestion(id: "9", questionId: "r9", plantId: "rose", type: "TrueFalse",
+                    promptText: "Roses require more careful care than daisies.",
+                    correctAnswerId: "True", choices: ["True", "False"],
+                    hint: "They are more delicate", difficulty: 1),
+                QuizQuestion(id: "10", questionId: "r10", plantId: "rose", type: "IdentifyPart",
+                    promptText: "Which part is most recognizable?",
+                    correctAnswerId: "Petals", choices: ["Root", "Stem", "Leaf", "Petals"],
+                    hint: "Why people give roses as gifts", difficulty: 1)
+            ]
+        default:
+            return []
+        }
+    }
+    
+    func validateAnswer(questionId: String, answer: String) -> AnswerResponse {
+        let question = getAllQuestions().first { $0.questionId == questionId }
+        let isCorrect = answer == question?.correctAnswerId
+        
+        return AnswerResponse(
+            isCorrect: isCorrect,
+            correctAnswer: question?.correctAnswerId ?? "",
+            hint: isCorrect ? nil : question?.hint
+        )
+    }
+    
+    private func getAllQuestions() -> [QuizQuestion] {
+        return getQuizQuestions(plantId: "daisy") +
+               getQuizQuestions(plantId: "sunflower") +
+               getQuizQuestions(plantId: "rose")
+    }
+}
+
+// MARK: - Audio Service
+class AudioService {
+    func playSuccess() {
+        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+        impactFeedback.impactOccurred()
+    }
+    
+    func playError() {
+        let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
+        impactFeedback.impactOccurred()
+    }
+}
+
+// MARK: - AR Service with Real Detection
+class ARService: NSObject, ARSessionDelegate {
+    private let arSession = ARSession()
+    @Published var arStatus: ARStatus = .searching
+    
+    override init() {
+        super.init()
+        arSession.delegate = self
+    }
+    
+    func startARSession() {
+        let configuration = ARWorldTrackingConfiguration()
+        
+        // Enable image tracking for plant reference cards
+        if let referenceImages = ARReferenceImage.referenceImages(inGroupNamed: "AR Resources", bundle: nil) {
+            configuration.detectionImages = referenceImages
+            configuration.maximumNumberOfTrackedImages = 1
+        }
+        
+        // Enable plane detection
+        if ARWorldTrackingConfiguration.isSupported {
+            configuration.planeDetection = [.horizontal, .vertical]
+        }
+        
+        arSession.run(configuration)
+    }
+    
+    func pauseARSession() {
+        arSession.pause()
+    }
+    
+    // MARK: - AR Session Delegate
+    func session(_ session: ARSession, didAdd anchors: [AnchorEntity]) {
+        print("Detected \(anchors.count) anchors")
+    }
+    
+    func session(_ session: ARSession, didUpdate anchors: [AnchorEntity]) {
+        // Update model positions as needed
+    }
+    
+    func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
+        switch camera.trackingState {
+        case .normal:
+            print("AR tracking normal")
+            DispatchQueue.main.async {
+                self.arStatus = .loading
+            }
+        case .limited:
+            print("AR tracking limited")
+            DispatchQueue.main.async {
+                self.arStatus = .searching
+            }
+        case .notAvailable:
+            print("AR tracking not available")
+            DispatchQueue.main.async {
+                self.arStatus = .error("AR not available")
+            }
+        @unknown default:
+            break
+        }
+    }
+}
