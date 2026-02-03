@@ -1,0 +1,39 @@
+{
+  "name": "PlantPart",
+  "type": "object",
+  "properties": {
+    "plant_id": {
+      "type": "string",
+      "description": "ID of the parent plant"
+    },
+    "part_name": {
+      "type": "string",
+      "enum": [
+        "Roots",
+        "Stem",
+        "Leaves",
+        "Flowers",
+        "Seeds",
+        "Fruits"
+      ],
+      "description": "Type of plant part"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of this plant part"
+    },
+    "fun_fact": {
+      "type": "string",
+      "description": "Fun fact about this part"
+    },
+    "function": {
+      "type": "string",
+      "description": "What this part does for the plant"
+    }
+  },
+  "required": [
+    "plant_id",
+    "part_name",
+    "description"
+  ]
+}

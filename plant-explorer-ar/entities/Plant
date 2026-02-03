@@ -1,0 +1,37 @@
+{
+  "name": "Plant",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the plant"
+    },
+    "scientific_name": {
+      "type": "string",
+      "description": "Scientific name"
+    },
+    "description": {
+      "type": "string",
+      "description": "General description of the plant"
+    },
+    "fun_facts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Fun facts about the plant"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Image URL for the plant"
+    },
+    "color": {
+      "type": "string",
+      "description": "Primary color for the plant theme"
+    }
+  },
+  "required": [
+    "name",
+    "description"
+  ]
+}

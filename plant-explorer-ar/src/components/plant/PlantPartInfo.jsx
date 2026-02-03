@@ -1,0 +1,78 @@
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Volume2, X, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
+
+export default function PlantPartInfo({ part, onClose, onSpeak }) {
+  const partEmojis = {
+    'Roots': '🌱',
+    'Stem': '🎋',
+    'Leaves': '🍃',
+    'Flowers': '🌸',
+    'Seeds': '🌰',
+    'Fruits': '🍎'
+  };
+
+  const partColors = {
+    'Roots': 'from-amber-400 to-orange-500',
+    'Stem': 'from-green-400 to-green-600',
+    'Leaves': 'from-lime-400 to-green-500',
+    'Flowers': 'from-pink-400 to-rose-500',
+    'Seeds': 'from-yellow-400 to-orange-400',
+    'Fruits': 'from-red-400 to-pink-500'
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.9, y: 20 }}
+    >
+      <Card className={`bg-gradient-to-br ${partColors[part.part_name]} border-2 border-white shadow-2xl`}>
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-4xl">{partEmojis[part.part_name]}</span>
+              <CardTitle className="text-2xl text-white">{part.part_name}</CardTitle>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="text-white hover:bg-white/20"
+            >
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="bg-white/90 backdrop-blur rounded-lg p-4">
+            <h4 className="font-bold text-gray-800 mb-2 flex items-center gap-2">
+              📖 What it does:
+            </h4>
+            <p className="text-gray-700">{part.function || part.description}</p>
+          </div>
+
+          {part.fun_fact && (
+            <div className="bg-white/90 backdrop-blur rounded-lg p-4">
+              <h4 className="font-bold text-gray-800 mb-2 flex items-center gap-2">
+                <Sparkles className="w-4 h-4" />
+                Fun Fact:
+              </h4>
+              <p className="text-gray-700">{part.fun_fact}</p>
+            </div>
+          )}
+
+          <Button
+            onClick={() => onSpeak(part.description + (part.fun_fact ? '. ' + part.fun_fact : ''))}
+            className="w-full bg-white/90 hover:bg-white text-gray-800"
+          >
+            <Volume2 className="w-4 h-4 mr-2" />
+            Listen to Description
+          </Button>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
