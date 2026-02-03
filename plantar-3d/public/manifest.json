@@ -1,0 +1,40 @@
+{
+  "name": "Plantar",
+  "short_name": "Plantar",
+  "description": "Learn about plants interactively",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f0f9f4",
+  "theme_color": "#2d6a4f",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": ["education", "utilities"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Scan Plant",
+      "short_name": "Scan",
+      "url": "/scanner",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Plant Library",
+      "short_name": "Library",
+      "url": "/library",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Quiz",
+      "short_name": "Quiz",
+      "url": "/quiz",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
+    }
+  ]
+}
